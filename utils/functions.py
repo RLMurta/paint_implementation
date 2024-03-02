@@ -14,8 +14,24 @@ class Functions:
     def reflex(self, points, axis):
         pass
 
-    def dda(self, x1, y1, x2, y2):
-        pass
+    def dda(self, x1, y1, x2, y2, color):
+        points = []
+        dx = x2 - x1
+        dy = y2 - y1
+
+        if abs(dx) > abs(dy):
+            steps = abs(dx)
+        else:
+            steps = abs(dy)
+
+        x_inc, y_inc = dx / steps, dy / steps
+        x, y = x1, y1
+        points.append((x, y, color))
+        for _ in range(steps):
+            x += x_inc
+            y += y_inc
+            points.append((round(x), round(y), color))
+        return points
 
     def bres(self, x1, y1, x2, y2):
         pass
