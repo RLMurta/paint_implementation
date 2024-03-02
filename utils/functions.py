@@ -1,3 +1,5 @@
+from .settings import *
+
 class Functions:
     def __init__(self):
         pass
@@ -15,7 +17,17 @@ class Functions:
         pass
 
     def reflex(self, points, axis):
-        pass
+        cartesian_points = self.to_cartesian_plane(points)
+        new_points = []
+        if axis == "x":
+            for (x, y, color) in cartesian_points:
+                new_points.append((x, -y, color))
+        elif axis == "y":
+            for (x, y, color) in cartesian_points:
+                new_points.append((-x, y, color))
+        else:
+            return points
+        return self.to_screen_plane(new_points)
 
     def dda(self, x1, y1, x2, y2, color):
         points = []
@@ -88,3 +100,15 @@ class Functions:
 
     def circle(self, x, y, r):
         pass
+
+    def to_cartesian_plane(self, points):
+        new_points = []
+        for (x, y, color) in points:
+            new_points.append((x - COLS/2, y - ROWS/2, color))
+        return new_points
+    
+    def to_screen_plane(self, points):
+        new_points = []
+        for (x, y, color) in points:
+            new_points.append((x + COLS/2, y + ROWS/2, color))
+        return new_points
