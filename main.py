@@ -88,7 +88,6 @@ while run:
         if event.type == pygame.QUIT:
             run = False
 
-
         if pygame.mouse.get_pressed()[0]:
             pos = pygame.mouse.get_pos()
 
@@ -100,14 +99,42 @@ while run:
                     if not button.clicked(pos):
                         continue
 
-                    drawing_color = button.color
+                    if button.text == None:
+                        drawing_color = button.color
 
-                    if not button.background_color == WHITE:
-                        selected_color = drawing_color
+                    if button.text == "Eraser":
+                        drawing_color = BG_COLOR
 
                     if button.text == "Clear":
                         grid = init_grid(ROWS, COLS, BG_COLOR)
                         drawing_color = BLACK
+
+                    if button.text == "Move":
+                        pass
+
+                    if button.text == "Rotate":
+                        pass
+
+                    if button.text == "Resize":
+                        pass
+
+                    if button.text == "Reflex":
+                        pass
+
+                    if button.text == "DDA":
+                        pass
+
+                    if button.text == "Bres":
+                        pass
+
+                    if button.text == "C-S":
+                        pass
+
+                    if button.text == "L-B":
+                        pass
+
+                    if button.text == "Circle":
+                        pass
 
     draw(WIN, grid, buttons)
 
