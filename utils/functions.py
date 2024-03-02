@@ -33,8 +33,50 @@ class Functions:
             points.append((round(x), round(y), color))
         return points
 
-    def bres(self, x1, y1, x2, y2):
-        pass
+    def bres(self, x1, y1, x2, y2, color):
+        points = []
+        dx, dy = x2 - x1, y2 - y1
+
+        if dx >= 0:
+            incrx = 1
+        else:
+            incrx = -1
+            dx = -dx
+        
+        if dy >= 0:
+            incry = 1
+        else:
+            incry = -1
+            dy = -dy
+
+        x, y = x1, y1
+        points.append((x, y, color))
+
+        if dx > dy:
+            p = 2 * dy - dx
+            const1 = 2 * dy
+            const2 = 2 * (dy - dx)
+            for _ in range(dx):
+                x += incrx
+                if p < 0:
+                    p += const1
+                else:
+                    y += incry
+                    p += const2
+                points.append((x, y, color))
+        else:
+            p = 2 * dx - dy
+            const1 = 2 * dx
+            const2 = 2 * (dx - dy)
+            for _ in range(dy):
+                y += incry
+                if p < 0:
+                    p += const1
+                else:
+                    x += incrx
+                    p += const2
+                points.append((x, y, color))
+        return points
 
     def cohen_sutherland(self, x1, y1, x2, y2, x_min, y_min, x_max, y_max):
         pass
