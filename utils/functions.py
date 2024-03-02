@@ -3,7 +3,10 @@ class Functions:
         pass
 
     def move(self, points, dx, dy):
-        pass
+        new_points = []
+        for (x, y, color) in points:
+            new_points.append((x + dx, y + dy, color))
+        return new_points
 
     def rotate(self, points, angle):
         pass
