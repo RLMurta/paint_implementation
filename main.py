@@ -1,7 +1,7 @@
 from utils import *
 
 selected_color = BLACK
-
+point_list = []
 
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Drawing Program")
@@ -77,7 +77,6 @@ buttons = [
     Button(400, button_y - 5, 75, 30, WHITE, "C-S", BLACK),
     Button(400, button_y + 30, 75, 30, WHITE, "L-B", BLACK),
     Button(480, button_y - 5, 75, 30, WHITE, "Circle", BLACK)
-
 ]
 
 while run:
@@ -94,6 +93,20 @@ while run:
             try:
                 row, col = get_row_col_from_pos(pos)
                 grid[row][col] = drawing_color
+                
+                # Here is the logic to save the points and their colors
+                target_col, target_row = col, row
+                filtered_points = [(col, row, color) for (col, row, color) in point_list if col == target_col and row == target_row]
+                if drawing_color == BG_COLOR:
+                    if filtered_points:
+                        point_list.remove(filtered_points[0])
+                else:
+                    if filtered_points:
+                        point_list.remove(filtered_points[0])
+                        point_list.append((col, row, drawing_color))
+                    else:
+                        point_list.append((col, row, drawing_color))
+                
             except IndexError:
                 for button in buttons:
                     if not button.clicked(pos):
@@ -108,6 +121,7 @@ while run:
                     if button.text == "Clear":
                         grid = init_grid(ROWS, COLS, BG_COLOR)
                         drawing_color = BLACK
+                        point_list = []
 
                     if button.text == "Move":
                         pass
