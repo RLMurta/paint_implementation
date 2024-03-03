@@ -51,6 +51,12 @@ def get_row_col_from_pos(pos):
 
     return row, col
 
+def set_grid(points):
+    grid = init_grid(ROWS, COLS, BG_COLOR)
+    for (x, y, color) in points:
+        grid[y][x] = color
+    return grid
+
 
 run = True
 clock = pygame.time.Clock()
@@ -148,10 +154,12 @@ while run:
                         pass
 
                     elif button.text == "Reflex X":
-                        pass
+                        point_list = functions.reflex(point_list, "x")
+                        grid = set_grid(point_list)
 
                     elif button.text == "Reflex Y":
-                        pass
+                        point_list = functions.reflex(point_list, "y")
+                        grid = set_grid(point_list)
 
     draw(WIN, grid, buttons)
 

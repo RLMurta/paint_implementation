@@ -104,11 +104,11 @@ class Functions:
     def to_cartesian_plane(self, points):
         new_points = []
         for (x, y, color) in points:
-            new_points.append((x - COLS/2, y - ROWS/2, color))
+            new_points.append((int(x - COLS/2), int(y - ROWS/2), color))
         return new_points
     
     def to_screen_plane(self, points):
         new_points = []
         for (x, y, color) in points:
-            new_points.append((x + COLS/2, y + ROWS/2, color))
+            new_points.append((int(x + COLS/2), int(y + ROWS/2), color))
         return new_points
