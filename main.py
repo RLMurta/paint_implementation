@@ -1,8 +1,5 @@
 from utils import *
 
-selected_color = BLACK
-point_list = []
-
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Drawing Program")
 
@@ -59,6 +56,8 @@ run = True
 clock = pygame.time.Clock()
 grid = init_grid(ROWS, COLS, BG_COLOR)
 drawing_color = BLACK
+functions = Functions()
+point_list = []
 
 button_y = HEIGHT - TOOLBAR_HEIGHT/2 - 25
 buttons = [
@@ -71,12 +70,13 @@ buttons = [
     Button(160, button_y - 5, 75, 30, WHITE, "Move", BLACK),
     Button(160, button_y + 30, 75, 30, WHITE, "Rotate", BLACK),
     Button(240, button_y - 5, 75, 30, WHITE, "Resize", BLACK),
-    Button(240, button_y + 30, 75, 30, WHITE, "Reflex", BLACK),
+    Button(240, button_y + 30, 75, 30, WHITE, "Circle", BLACK),
     Button(320, button_y - 5, 75, 30, WHITE, "DDA", BLACK),
     Button(320, button_y + 30, 75, 30, WHITE, "Bres", BLACK),
     Button(400, button_y - 5, 75, 30, WHITE, "C-S", BLACK),
     Button(400, button_y + 30, 75, 30, WHITE, "L-B", BLACK),
-    Button(480, button_y - 5, 75, 30, WHITE, "Circle", BLACK)
+    Button(480, button_y - 5, 100, 30, WHITE, "Reflex X", BLACK),
+    Button(480, button_y + 30, 100, 30, WHITE, "Reflex Y", BLACK)
 ]
 
 while run:
@@ -118,36 +118,39 @@ while run:
                     if button.text == "Eraser":
                         drawing_color = BG_COLOR
 
-                    if button.text == "Clear":
+                    elif button.text == "Clear":
                         grid = init_grid(ROWS, COLS, BG_COLOR)
                         drawing_color = BLACK
                         point_list = []
 
-                    if button.text == "Move":
+                    elif button.text == "Move":
                         pass
 
-                    if button.text == "Rotate":
+                    elif button.text == "Rotate":
                         pass
 
-                    if button.text == "Resize":
+                    elif button.text == "Resize":
                         pass
 
-                    if button.text == "Reflex":
+                    elif button.text == "Circle":
                         pass
 
-                    if button.text == "DDA":
+                    elif button.text == "DDA":
                         pass
 
-                    if button.text == "Bres":
+                    elif button.text == "Bres":
                         pass
 
-                    if button.text == "C-S":
+                    elif button.text == "C-S":
                         pass
 
-                    if button.text == "L-B":
+                    elif button.text == "L-B":
                         pass
 
-                    if button.text == "Circle":
+                    elif button.text == "Reflex X":
+                        pass
+
+                    elif button.text == "Reflex Y":
                         pass
 
     draw(WIN, grid, buttons)
