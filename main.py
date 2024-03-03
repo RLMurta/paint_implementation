@@ -54,7 +54,8 @@ def get_row_col_from_pos(pos):
 def set_grid(points):
     grid = init_grid(ROWS, COLS, BG_COLOR)
     for (x, y, color) in points:
-        grid[y][x] = color
+        if 0 <= x < COLS and 0 <= y < ROWS:
+            grid[y][x] = color
     return grid
 
 
