@@ -157,7 +157,15 @@ while run:
                             grid = set_grid(point_list)
 
                     elif button.text == "Bres":
-                        pass
+                        if point_a is not None and point_b is not None:
+                            x1, y1 = point_a
+                            x2, y2 = point_b
+                            for point in functions.bres(x1, y1, x2, y2, drawing_color):
+                                points_filtered = functions.check_point((point[0],point[1]), point_list)
+                                if points_filtered:
+                                    point_list.remove(points_filtered[0])
+                                point_list.append(point)
+                            grid = set_grid(point_list)
 
                     elif button.text == "C-S":
                         pass
