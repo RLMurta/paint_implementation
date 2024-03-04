@@ -98,8 +98,31 @@ class Functions:
     def lian_barsky(self, x1, y1, x2, y2, x_min, y_min, x_max, y_max):
         pass
 
-    def circle(self, x, y, r):
-        pass
+    def circle(self, xc, yc, r, color):
+        points = []
+        x, y, p = 0, r, 3 - 2*r
+        points += self.get_circle_points(xc, yc, x, y, color)
+        while x <= y:
+            if p < 0:
+                p += 4*x + 6
+            else:
+                y -= 1
+                p += 4*(x - y) + 10
+            x += 1
+            points += self.get_circle_points(xc, yc, x, y, color)
+        return points
+
+    def get_circle_points(self, xc, yc, x, y, color):
+        points = []
+        points.append((xc + x, yc + y, color))
+        points.append((xc - x, yc + y, color))
+        points.append((xc + x, yc - y, color))
+        points.append((xc - x, yc - y, color))
+        points.append((xc + y, yc + x, color))
+        points.append((xc - y, yc + x, color))
+        points.append((xc + y, yc - x, color))
+        points.append((xc - y, yc - x, color))
+        return points
 
     def to_cartesian_plane(self, points):
         new_points = []
