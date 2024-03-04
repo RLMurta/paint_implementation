@@ -65,6 +65,7 @@ grid = init_grid(ROWS, COLS, BG_COLOR)
 drawing_color = BLACK
 functions = Functions()
 point_list = []
+point_a, point_b = None, None
 
 button_y = HEIGHT - TOOLBAR_HEIGHT/2 - 25
 buttons = [
@@ -100,6 +101,9 @@ while run:
             try:
                 row, col = get_row_col_from_pos(pos)
                 grid[row][col] = drawing_color
+                if not (col, row) == point_a:
+                    point_b = point_a
+                    point_a = (col, row)
                 
                 # Here is the logic to save the points and their colors
                 target_col, target_row = col, row
@@ -143,7 +147,11 @@ while run:
                         pass
 
                     elif button.text == "DDA":
-                        pass
+                        if point_a is not None and point_b is not None:
+                            x1, y1 = point_a
+                            x2, y2 = point_b
+                            point_list += functions.dda(x1, y1, x2, y2, drawing_color)
+                            grid = set_grid(point_list)
 
                     elif button.text == "Bres":
                         pass
