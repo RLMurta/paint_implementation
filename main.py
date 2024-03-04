@@ -106,8 +106,7 @@ while run:
                     point_a = (col, row)
                 
                 # Here is the logic to save the points and their colors
-                target_col, target_row = col, row
-                filtered_points = [(col, row, color) for (col, row, color) in point_list if col == target_col and row == target_row]
+                filtered_points = functions.check_point((col, row), point_list)
                 if drawing_color == BG_COLOR:
                     if filtered_points:
                         point_list.remove(filtered_points[0])
@@ -150,7 +149,11 @@ while run:
                         if point_a is not None and point_b is not None:
                             x1, y1 = point_a
                             x2, y2 = point_b
-                            point_list += functions.dda(x1, y1, x2, y2, drawing_color)
+                            for point in functions.dda(x1, y1, x2, y2, drawing_color):
+                                points_filtered = functions.check_point((point[0],point[1]), point_list)
+                                if points_filtered:
+                                    point_list.remove(points_filtered[0])
+                                point_list.append(point)
                             grid = set_grid(point_list)
 
                     elif button.text == "Bres":

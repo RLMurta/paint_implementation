@@ -112,3 +112,7 @@ class Functions:
         for (x, y, color) in points:
             new_points.append((int(x + COLS/2), int(y + ROWS/2), color))
         return new_points
+    
+    def check_point(self, point, points):
+        target_col, target_row = point[0], point[1]
+        return [(col, row, color) for (col, row, color) in points if col == target_col and row == target_row]
