@@ -1,4 +1,5 @@
 from .settings import *
+import math
 
 class Functions:
     def __init__(self):
@@ -139,3 +140,6 @@ class Functions:
     def check_point(self, point, points):
         target_col, target_row = point[0], point[1]
         return [(col, row, color) for (col, row, color) in points if col == target_col and row == target_row]
+    
+    def distance(self, point1, point2):
+        return int(math.sqrt((point2[0] - point1[0])**2 + (point2[1] - point1[1])**2))
