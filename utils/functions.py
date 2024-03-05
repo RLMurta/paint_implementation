@@ -15,7 +15,10 @@ class Functions:
         pass
 
     def resize(self, points, scale_x, scale_y):
-        pass
+        new_points = []
+        for (x, y, color) in points:
+            new_points.append((x * scale_x, y * scale_y, color))
+        return new_points
 
     def reflex(self, points, axis):
         cartesian_points = self.to_cartesian_plane(points)
