@@ -22,10 +22,10 @@ class Functions:
         new_points = []
         if axis == "x":
             for (x, y, color) in cartesian_points:
-                new_points.append((x, -y - 1, color))
+                new_points.append((-x - 1, y, color))
         elif axis == "y":
             for (x, y, color) in cartesian_points:
-                new_points.append((-x - 1, y, color))
+                new_points.append((x, -y - 1, color))
         else:
             return points
         return self.to_screen_plane(new_points)
