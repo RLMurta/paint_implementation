@@ -101,11 +101,57 @@ class Functions:
                 points.append((x, y, color))
         return points
 
-    def cohen_sutherland(self, x1, y1, x2, y2, x_min, y_min, x_max, y_max):
-        pass
+    def cohen_sutherland(self, pointa, pointb, x_min, y_min, x_max, y_max):
+        x1, y1, colora = pointa
+        x2, y2, colorb = pointb
+        acept, done = False, False
+        while not done:
+            c1 = self.region_code(x1, y1, x_min, y_min, x_max, y_max)
+            c2 = self.region_code(x2, y2, x_min, y_min, x_max, y_max)
+            if c1 == 0 and c2 == 0:
+                acept, done = True, True
+            elif c1 & c2 != 0:
+                done = True
+            else:
+                if c1 != 0:
+                    c_out = c1
+                else:
+                    c_out = c2
+                if c_out & 1:
+                    xint = x_min
+                    yint = y1 + (y2 - y1) * (x_min - x1) / (x2 - x1)
+                elif c_out & 2:
+                    xint = x_max
+                    yint = y1 + (y2 - y1) * (x_max - x1) / (x2 - x1)
+                elif c_out & 4:
+                    yint = y_min
+                    xint = x1 + (x2 - x1) * (y_min - y1) / (y2 - y1)
+                elif c_out & 8:
+                    yint = y_max
+                    xint = x1 + (x2 - x1) * (y_max - y1) / (y2 - y1)
+                if c_out == c1:
+                    x1, y1 = xint, yint
+                else:
+                    x2, y2 = xint, yint
+        if acept:
+            return [(int(x1), int(y1), colora), (int(x2), int(y2), colorb)]
+        return None
+            
 
     def lian_barsky(self, x1, y1, x2, y2, x_min, y_min, x_max, y_max):
         pass
+
+    def region_code(self, x, y, x_min, y_min, x_max, y_max):
+        code = 0
+        if x < x_min:
+            code += 1
+        elif x > x_max:
+            code += 2
+        if y < y_min:
+            code += 4
+        elif y > y_max:
+            code += 8
+        return code
 
     def circle(self, xc, yc, r, color):
         points = []
