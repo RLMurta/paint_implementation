@@ -136,10 +136,45 @@ class Functions:
         if acept:
             return [(int(x1), int(y1), colora), (int(x2), int(y2), colorb)]
         return None
-            
 
-    def lian_barsky(self, x1, y1, x2, y2, x_min, y_min, x_max, y_max):
-        pass
+    def liang_barsky(self, pointa, pointb, x_min, y_min, x_max, y_max):
+        x1, y1, colora = pointa
+        x2, y2, colorb = pointb
+        u1, u2 = 0, 1
+        dx, dy = x2 - x1, y2 - y1
+        clip_test, u1, u2 = self.clip_test(-dx, x1 - x_min, u1, u2)
+        if clip_test:
+            clip_test, u1, u2 = self.clip_test(dx, x_max - x1, u1, u2)
+            if clip_test:
+                clip_test, u1, u2 = self.clip_test(-dy, y1 - y_min, u1, u2)
+                if clip_test:
+                    clip_test, u1, u2 = self.clip_test(dy, y_max - y1, u1, u2)
+                    if clip_test:
+                        if u2 < 1:
+                            x2 = x1 + u2 * dx
+                            y2 = y1 + u2 * dy
+                        if u1 > 0:
+                            x1 = x1 + u1 * dx
+                            y1 = y1 + u1 * dy
+                        return [(int(x1), int(y1), colora), (int(x2), int(y2), colorb)]
+
+    def clip_test(self, p, q, u1, u2):
+        result = True
+        if p < 0:
+            r = q / p
+            if r > u2:
+                result = False
+            elif r > u1:
+                u1 = r
+        elif p > 0:
+            r = q / p
+            if r < u1:
+                result = False
+            elif r < u2:
+                u2 = r
+        elif q < 0:
+            result = False
+        return result, u1, u2
 
     def region_code(self, x, y, x_min, y_min, x_max, y_max):
         code = 0
