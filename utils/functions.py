@@ -12,7 +12,12 @@ class Functions:
         return new_points
 
     def rotate(self, points, angle):
-        pass
+        new_points = []
+        for (x, y, color) in points:
+            new_x = x * math.cos(angle) - y * math.sin(angle)
+            new_y = x * math.sin(angle) + y * math.cos(angle)
+            new_points.append((new_x, new_y, color))
+        return new_points
 
     def resize(self, points, scale_x, scale_y):
         new_points = []
