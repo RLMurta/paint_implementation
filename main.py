@@ -58,142 +58,145 @@ def set_grid(points):
             grid[y][x] = color
     return grid
 
+def set_buttons():
+    button_y = HEIGHT - TOOLBAR_HEIGHT/2 - 25
+    return [
+        Button(10, button_y, 25, 25, BLACK, background_color=BLACK),
+        Button(10, button_y + 25, 25, 25, RED, background_color=RED),
+        Button(35, button_y, 25, 25, GREEN, background_color=GREEN),
+        Button(35, button_y + 25, 25, 25, BLUE, background_color=BLUE),
+        Button(80, button_y - 5, 75, 30, WHITE, "Eraser", BLACK),
+        Button(80, button_y + 30, 75, 30, WHITE, "Clear", BLACK),
+        Button(160, button_y - 5, 75, 30, WHITE, "Move", BLACK),
+        Button(160, button_y + 30, 75, 30, WHITE, "Rotate", BLACK),
+        Button(240, button_y - 5, 75, 30, WHITE, "Resize", BLACK),
+        Button(240, button_y + 30, 75, 30, WHITE, "Circle", BLACK),
+        Button(320, button_y - 5, 75, 30, WHITE, "DDA", BLACK),
+        Button(320, button_y + 30, 75, 30, WHITE, "Bres", BLACK),
+        Button(400, button_y - 5, 75, 30, WHITE, "C-S", BLACK),
+        Button(400, button_y + 30, 75, 30, WHITE, "L-B", BLACK),
+        Button(480, button_y - 5, 100, 30, WHITE, "Reflex X", BLACK),
+        Button(480, button_y + 30, 100, 30, WHITE, "Reflex Y", BLACK)
+    ]
 
-run = True
-clock = pygame.time.Clock()
-grid = init_grid(ROWS, COLS, BG_COLOR)
-drawing_color = BLACK
-functions = Functions()
-point_list = []
-line_list = []
-circle_list = []
-point_a, point_b = None, None
+def run():
+    run = True
+    clock = pygame.time.Clock()
+    grid = init_grid(ROWS, COLS, BG_COLOR)
+    drawing_color = BLACK
+    functions = Functions()
+    point_list = []
+    line_list = []
+    circle_list = []
+    point_a, point_b = None, None
+    buttons = set_buttons()
 
-button_y = HEIGHT - TOOLBAR_HEIGHT/2 - 25
-buttons = [
-    Button(10, button_y, 25, 25, BLACK, background_color=BLACK),
-    Button(10, button_y + 25, 25, 25, RED, background_color=RED),
-    Button(35, button_y, 25, 25, GREEN, background_color=GREEN),
-    Button(35, button_y + 25, 25, 25, BLUE, background_color=BLUE),
-    Button(80, button_y - 5, 75, 30, WHITE, "Eraser", BLACK),
-    Button(80, button_y + 30, 75, 30, WHITE, "Clear", BLACK),
-    Button(160, button_y - 5, 75, 30, WHITE, "Move", BLACK),
-    Button(160, button_y + 30, 75, 30, WHITE, "Rotate", BLACK),
-    Button(240, button_y - 5, 75, 30, WHITE, "Resize", BLACK),
-    Button(240, button_y + 30, 75, 30, WHITE, "Circle", BLACK),
-    Button(320, button_y - 5, 75, 30, WHITE, "DDA", BLACK),
-    Button(320, button_y + 30, 75, 30, WHITE, "Bres", BLACK),
-    Button(400, button_y - 5, 75, 30, WHITE, "C-S", BLACK),
-    Button(400, button_y + 30, 75, 30, WHITE, "L-B", BLACK),
-    Button(480, button_y - 5, 100, 30, WHITE, "Reflex X", BLACK),
-    Button(480, button_y + 30, 100, 30, WHITE, "Reflex Y", BLACK)
-]
+    while run:
+        clock.tick(FPS)
 
-while run:
-    clock.tick(FPS)
+        for event in pygame.event.get():
+            # If user clicks the close window button
+            if event.type == pygame.QUIT:
+                run = False
 
-    for event in pygame.event.get():
-        # If user clicks the close window button
-        if event.type == pygame.QUIT:
-            run = False
+            if pygame.mouse.get_pressed()[0]:
+                pos = pygame.mouse.get_pos()
 
-        if pygame.mouse.get_pressed()[0]:
-            pos = pygame.mouse.get_pos()
-
-            try:
-                row, col = get_row_col_from_pos(pos)
-                grid[row][col] = drawing_color
-                if not (col, row) == point_a:
-                    point_b = point_a
-                    point_a = (col, row)
-                
-                # Here is the logic to save the points and their colors
-                filtered_points = functions.check_point((col, row), point_list)
-                if drawing_color == BG_COLOR:
-                    if filtered_points:
-                        point_list.remove(filtered_points[0])
-                else:
-                    if filtered_points:
-                        point_list.remove(filtered_points[0])
-                        point_list.append((col, row, drawing_color))
+                try:
+                    row, col = get_row_col_from_pos(pos)
+                    grid[row][col] = drawing_color
+                    if not (col, row) == point_a:
+                        point_b = point_a
+                        point_a = (col, row)
+                    
+                    # Here is the logic to save the points and their colors
+                    filtered_points = functions.check_point((col, row), point_list)
+                    if drawing_color == BG_COLOR:
+                        if filtered_points:
+                            point_list.remove(filtered_points[0])
                     else:
-                        point_list.append((col, row, drawing_color))
-                
-            except IndexError:
-                for button in buttons:
-                    if not button.clicked(pos):
-                        continue
+                        if filtered_points:
+                            point_list.remove(filtered_points[0])
+                            point_list.append((col, row, drawing_color))
+                        else:
+                            point_list.append((col, row, drawing_color))
+                    
+                except IndexError:
+                    for button in buttons:
+                        if not button.clicked(pos):
+                            continue
 
-                    if button.text == None:
-                        drawing_color = button.color
+                        if button.text == None:
+                            drawing_color = button.color
 
-                    if button.text == "Eraser":
-                        drawing_color = BG_COLOR
+                        if button.text == "Eraser":
+                            drawing_color = BG_COLOR
 
-                    elif button.text == "Clear":
-                        grid = init_grid(ROWS, COLS, BG_COLOR)
-                        drawing_color = BLACK
-                        point_list = []
+                        elif button.text == "Clear":
+                            grid = init_grid(ROWS, COLS, BG_COLOR)
+                            drawing_color = BLACK
+                            point_list = []
 
-                    elif button.text == "Move":
-                        pass
+                        elif button.text == "Move":
+                            pass
 
-                    elif button.text == "Rotate":
-                        pass
+                        elif button.text == "Rotate":
+                            pass
 
-                    elif button.text == "Resize":
-                        pass
+                        elif button.text == "Resize":
+                            pass
 
-                    elif button.text == "Circle":
-                        if point_a is not None and point_b is not None:
-                            x1, y1 = point_a
-                            x2, y2 = point_b
-                            circle_list.append((point_a,point_b,drawing_color))
-                            for point in functions.circle(x1, y1, functions.distance(point_b, point_a), drawing_color):
-                                points_filtered = functions.check_point((point[0],point[1]), point_list)
-                                if points_filtered:
-                                    point_list.remove(points_filtered[0])
-                                point_list.append(point)
+                        elif button.text == "Circle":
+                            if point_a is not None and point_b is not None:
+                                x1, y1 = point_a
+                                x2, y2 = point_b
+                                circle_list.append((point_a,point_b,drawing_color))
+                                for point in functions.circle(x1, y1, functions.distance(point_b, point_a), drawing_color):
+                                    points_filtered = functions.check_point((point[0],point[1]), point_list)
+                                    if points_filtered:
+                                        point_list.remove(points_filtered[0])
+                                    point_list.append(point)
+                                grid = set_grid(point_list)
+
+                        elif button.text == "DDA":
+                            if point_a is not None and point_b is not None:
+                                x1, y1 = point_a
+                                x2, y2 = point_b
+                                line_list.append((point_a,point_b,drawing_color))
+                                for point in functions.dda(x1, y1, x2, y2, drawing_color):
+                                    points_filtered = functions.check_point((point[0],point[1]), point_list)
+                                    if points_filtered:
+                                        point_list.remove(points_filtered[0])
+                                    point_list.append(point)
+                                grid = set_grid(point_list)
+
+                        elif button.text == "Bres":
+                            if point_a is not None and point_b is not None:
+                                x1, y1 = point_a
+                                x2, y2 = point_b
+                                line_list.append((point_a,point_b,drawing_color))
+                                for point in functions.bres(x1, y1, x2, y2, drawing_color):
+                                    points_filtered = functions.check_point((point[0],point[1]), point_list)
+                                    if points_filtered:
+                                        point_list.remove(points_filtered[0])
+                                    point_list.append(point)
+                                grid = set_grid(point_list)
+
+                        elif button.text == "C-S":
+                            pass
+
+                        elif button.text == "L-B":
+                            pass
+
+                        elif button.text == "Reflex X":
+                            point_list = functions.reflex(point_list, "x")
                             grid = set_grid(point_list)
 
-                    elif button.text == "DDA":
-                        if point_a is not None and point_b is not None:
-                            x1, y1 = point_a
-                            x2, y2 = point_b
-                            line_list.append((point_a,point_b,drawing_color))
-                            for point in functions.dda(x1, y1, x2, y2, drawing_color):
-                                points_filtered = functions.check_point((point[0],point[1]), point_list)
-                                if points_filtered:
-                                    point_list.remove(points_filtered[0])
-                                point_list.append(point)
+                        elif button.text == "Reflex Y":
+                            point_list = functions.reflex(point_list, "y")
                             grid = set_grid(point_list)
 
-                    elif button.text == "Bres":
-                        if point_a is not None and point_b is not None:
-                            x1, y1 = point_a
-                            x2, y2 = point_b
-                            line_list.append((point_a,point_b,drawing_color))
-                            for point in functions.bres(x1, y1, x2, y2, drawing_color):
-                                points_filtered = functions.check_point((point[0],point[1]), point_list)
-                                if points_filtered:
-                                    point_list.remove(points_filtered[0])
-                                point_list.append(point)
-                            grid = set_grid(point_list)
+        draw(WIN, grid, buttons)
 
-                    elif button.text == "C-S":
-                        pass
-
-                    elif button.text == "L-B":
-                        pass
-
-                    elif button.text == "Reflex X":
-                        point_list = functions.reflex(point_list, "x")
-                        grid = set_grid(point_list)
-
-                    elif button.text == "Reflex Y":
-                        point_list = functions.reflex(point_list, "y")
-                        grid = set_grid(point_list)
-
-    draw(WIN, grid, buttons)
-
-pygame.quit()
+    pygame.quit()
+run()
