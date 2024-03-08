@@ -5,40 +5,29 @@ class Functions:
     def __init__(self):
         pass
 
-    def move(self, points, dx, dy):
-        new_points = []
-        for (x, y, color) in points:
-            new_points.append((x + dx, y + dy, color))
-        return new_points
+    def move(self, x, y, dx, dy):
+        return x + dx, y + dy
 
-    def rotate(self, points, angle):
-        new_points = []
-        for (x, y, color) in points:
-            new_x = x * math.cos(angle) - y * math.sin(angle)
-            new_y = x * math.sin(angle) + y * math.cos(angle)
-            new_points.append((new_x, new_y, color))
-        return new_points
+    def rotate(self, x, y, angle):
+        new_x = x * math.cos(angle) - y * math.sin(angle)
+        new_y = x * math.sin(angle) + y * math.cos(angle)
+        return new_x, new_y
 
-    def resize(self, points, scale_x, scale_y):
-        new_points = []
-        for (x, y, color) in points:
-            new_points.append((x * scale_x, y * scale_y, color))
-        return new_points
+    def resize(self, x, y, scale_x, scale_y):
+        return x * scale_x, y * scale_y
 
-    def reflex(self, points, axis):
-        cartesian_points = self.to_cartesian_plane(points)
-        new_points = []
+    def reflex(self, x, y, axis):
+        new_x, new_y = self.to_cartesian_plane(x, y)
         if axis == "x":
-            for (x, y, color) in cartesian_points:
-                new_points.append((-x - 1, y, color))
+                return self.to_screen_plane(-new_x - 1, new_y)
         elif axis == "y":
-            for (x, y, color) in cartesian_points:
-                new_points.append((x, -y - 1, color))
+            return self.to_screen_plane(new_x, -new_y - 1)
+        elif axis == "xy":
+            return self.to_screen_plane(-new_x - 1, -new_y - 1)
         else:
-            return points
-        return self.to_screen_plane(new_points)
+            return x, y
 
-    def dda(self, x1, y1, x2, y2, color):
+    def dda(self, x1, y1, x2, y2):
         points = []
         dx, dy = x2 - x1, y2 - y1
 
@@ -49,14 +38,14 @@ class Functions:
 
         x_inc, y_inc = dx / steps, dy / steps
         x, y = x1, y1
-        points.append((x, y, color))
+        points.append((x, y))
         for _ in range(steps):
             x += x_inc
             y += y_inc
-            points.append((round(x), round(y), color))
+            points.append((round(x), round(y)))
         return points
 
-    def bres(self, x1, y1, x2, y2, color):
+    def bres(self, x1, y1, x2, y2):
         points = []
         dx, dy = x2 - x1, y2 - y1
 
@@ -73,7 +62,7 @@ class Functions:
             dy = -dy
 
         x, y = x1, y1
-        points.append((x, y, color))
+        points.append((x, y))
 
         if dx > dy:
             p = 2 * dy - dx
@@ -86,7 +75,7 @@ class Functions:
                 else:
                     y += incry
                     p += const2
-                points.append((x, y, color))
+                points.append((x, y))
         else:
             p = 2 * dx - dy
             const1 = 2 * dx
@@ -98,12 +87,10 @@ class Functions:
                 else:
                     x += incrx
                     p += const2
-                points.append((x, y, color))
+                points.append((x, y))
         return points
 
-    def cohen_sutherland(self, pointa, pointb, x_min, y_min, x_max, y_max):
-        x1, y1, colora = pointa
-        x2, y2, colorb = pointb
+    def cohen_sutherland(self, x1, y1, x2, y2, x_min, y_min, x_max, y_max):
         acept, done = False, False
         while not done:
             c1 = self.region_code(x1, y1, x_min, y_min, x_max, y_max)
@@ -134,12 +121,10 @@ class Functions:
                 else:
                     x2, y2 = xint, yint
         if acept:
-            return [(int(x1), int(y1), colora), (int(x2), int(y2), colorb)]
+            return [(int(x1), int(y1)), (int(x2), int(y2))]
         return None
 
-    def liang_barsky(self, pointa, pointb, x_min, y_min, x_max, y_max):
-        x1, y1, colora = pointa
-        x2, y2, colorb = pointb
+    def liang_barsky(self, x1, y1, x2, y2, x_min, y_min, x_max, y_max):
         u1, u2 = 0, 1
         dx, dy = x2 - x1, y2 - y1
         clip_test, u1, u2 = self.clip_test(-dx, x1 - x_min, u1, u2)
@@ -156,7 +141,7 @@ class Functions:
                         if u1 > 0:
                             x1 = x1 + u1 * dx
                             y1 = y1 + u1 * dy
-                        return [(int(x1), int(y1), colora), (int(x2), int(y2), colorb)]
+                        return [(int(x1), int(y1)), (int(x2), int(y2))]
 
     def clip_test(self, p, q, u1, u2):
         result = True
@@ -188,10 +173,10 @@ class Functions:
             code += 8
         return code
 
-    def circle(self, xc, yc, r, color):
+    def circle(self, xc, yc, r):
         points = []
         x, y, p = 0, r, 3 - 2*r
-        points += self.get_circle_points(xc, yc, x, y, color)
+        points += self.get_circle_points(xc, yc, x, y)
         while x <= y:
             if p < 0:
                 p += 4*x + 6
@@ -199,36 +184,26 @@ class Functions:
                 y -= 1
                 p += 4*(x - y) + 10
             x += 1
-            points += self.get_circle_points(xc, yc, x, y, color)
+            points += self.get_circle_points(xc, yc, x, y)
         return points
 
-    def get_circle_points(self, xc, yc, x, y, color):
+    def get_circle_points(self, xc, yc, x, y):
         points = []
-        points.append((xc + x, yc + y, color))
-        points.append((xc - x, yc + y, color))
-        points.append((xc + x, yc - y, color))
-        points.append((xc - x, yc - y, color))
-        points.append((xc + y, yc + x, color))
-        points.append((xc - y, yc + x, color))
-        points.append((xc + y, yc - x, color))
-        points.append((xc - y, yc - x, color))
+        points.append((xc + x, yc + y))
+        points.append((xc - x, yc + y))
+        points.append((xc + x, yc - y))
+        points.append((xc - x, yc - y))
+        points.append((xc + y, yc + x))
+        points.append((xc - y, yc + x))
+        points.append((xc + y, yc - x))
+        points.append((xc - y, yc - x))
         return points
 
-    def to_cartesian_plane(self, points):
-        new_points = []
-        for (x, y, color) in points:
-            new_points.append((int(x - COLS/2), int(y - ROWS/2), color))
-        return new_points
+    def to_cartesian_plane(self, x, y):
+        return int(x - COLS/2), int(y - ROWS/2)
     
-    def to_screen_plane(self, points):
-        new_points = []
-        for (x, y, color) in points:
-            new_points.append((int(x + COLS/2), int(y + ROWS/2), color))
-        return new_points
+    def to_screen_plane(self, x, y):
+        return int(x + COLS/2), int(y + ROWS/2)
     
-    def check_point(self, point, points):
-        target_col, target_row = point[0], point[1]
-        return [(col, row, color) for (col, row, color) in points if col == target_col and row == target_row]
-    
-    def distance(self, point1, point2):
-        return int(math.sqrt((point2[0] - point1[0])**2 + (point2[1] - point1[1])**2))
+    def distance(self, x1, y1, x2, y2):
+        return int(math.sqrt((x2 - x1)**2 + (y2 - y1)**2))
