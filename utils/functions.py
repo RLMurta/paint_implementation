@@ -206,8 +206,10 @@ class Functions:
     def to_screen_plane(self, x, y):
         return int(x + COLS/2), int(y + ROWS/2)
     
+    # Gets the distance between 2 points
     def distance(self, x1, y1, x2, y2):
         return int(math.sqrt((x2 - x1)**2 + (y2 - y1)**2))
     
+    # Gets the midpoint between 2 points
     def midpoint(self, x1, y1, x2, y2):
         return int((x1 + x2) // 2), int((y1 + y2) // 2)

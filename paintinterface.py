@@ -1,6 +1,7 @@
 from utils import *
 
 class PaintInterface:
+    # Initilize the window and the canvas
     def __init__(self):
         # Create a 2D array to store the state of each pixel (on/off)
         self.pixels = [[0 for _ in range(COLS)] for _ in range(ROWS)]
@@ -53,10 +54,12 @@ class PaintInterface:
 
         mainloop()
 
+    # Clear the pixel matrix and redraw the grid
     def clear_pixel_matrix(self):
         self.pixels = [[0 for _ in range(COLS)] for _ in range(ROWS)]
         self.draw_grid()
 
+    # Sets the grid with the current state of the points, lines and circles
     def color_grid(self, points=None, lines=None, circles=None):
         if not points:
             points = self.point_list
@@ -88,6 +91,7 @@ class PaintInterface:
                     self.pixels[y][x] = 1
         self.draw_grid()
 
+    # Draw the grid with the current state of the points, lines and circles
     def draw_grid(self):
         for i in range(ROWS):
             for j in range(COLS):
@@ -102,6 +106,7 @@ class PaintInterface:
         for i in range(COLS + 1):
             self.canvas.create_line(OFFSET + i*PIXEL_SIZE, OFFSET, OFFSET + i*PIXEL_SIZE, OFFSET + ROWS*PIXEL_SIZE, fill='black')
 
+    # Change the state of the pixel where the click occurred
     def click(self, event):
         # Calculate the position of the pixel where the click occurred
         x, y = (event.x - OFFSET) // PIXEL_SIZE, (event.y - OFFSET) // PIXEL_SIZE
