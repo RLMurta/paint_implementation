@@ -318,6 +318,8 @@ class PaintInterface:
                 if 0 <= x < COLS and 0 <= y < ROWS:
                     self.pixels[y][x] = 1
             self.circle_list.append((self.pointa, self.pointb))
+            if self.pointa in self.point_list:
+                self.point_list.remove(self.pointa)
             if self.pointb in self.point_list:
                 self.point_list.remove(self.pointb)
             self.color_grid()
