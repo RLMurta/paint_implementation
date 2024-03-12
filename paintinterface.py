@@ -368,5 +368,3 @@ class PaintInterface:
             if self.pointb in self.point_list:
                 self.point_list.remove(self.pointb)
             self.color_grid(lines=new_line_list)
-
-PaintInterface()
