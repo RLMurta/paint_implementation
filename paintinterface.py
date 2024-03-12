@@ -5,7 +5,7 @@ class PaintInterface:
         # Create a 2D array to store the state of each pixel (on/off)
         self.pixels = [[0 for _ in range(COLS)] for _ in range(ROWS)]
         # Saves the points, lines and circles positions
-        self.points = []
+        self.point_list = []
         self.line_list = []
         self.circle_list = []
         self.window = Tk()
@@ -59,7 +59,7 @@ class PaintInterface:
 
     def color_grid(self, points=None, lines=None, circles=None):
         if not points:
-            points = self.points
+            points = self.point_list
         if not lines:
             lines = self.line_list
         if not circles:
@@ -109,11 +109,11 @@ class PaintInterface:
         if 0 <= x < COLS and 0 <= y < ROWS:
             if self.pixels[y][x] == 1:
                 self.pixels[y][x] = 0
-                if (x, y) in self.points:
-                    self.points.remove((x, y))
+                if (x, y) in self.point_list:
+                    self.point_list.remove((x, y))
             else:
                 self.pixels[y][x] = 1
-                self.points.append((x, y))
+                self.point_list.append((x, y))
                 self.pointb = self.pointa
                 self.pointa = (x, y)
         # Redraw the grid
@@ -191,7 +191,7 @@ class PaintInterface:
         new_line_list = []
         new_circle_list = []
         self.clear_pixel_matrix()
-        for point in self.points:
+        for point in self.point_list:
             x, y = point
             x, y = self.functions.reflex(x, y, "x")
             new_points.append((x, y))
@@ -209,7 +209,7 @@ class PaintInterface:
             x2, y2 = self.functions.reflex(x2, y2, "x")
             new_circle = ((x1, y1),(x2, y2))
             new_circle_list.append(new_circle)
-        self.points = new_points
+        self.point_list = new_points
         self.line_list = new_line_list
         self.circle_list = new_circle_list
         self.color_grid()
@@ -219,7 +219,7 @@ class PaintInterface:
         new_line_list = []
         new_circle_list = []
         self.clear_pixel_matrix()
-        for point in self.points:
+        for point in self.point_list:
             x, y = point
             x, y = self.functions.reflex(x, y, "y")
             new_points.append((x, y))
@@ -237,7 +237,7 @@ class PaintInterface:
             x2, y2 = self.functions.reflex(x2, y2, "y")
             new_circle = ((x1, y1),(x2, y2))
             new_circle_list.append(new_circle)
-        self.points = new_points
+        self.point_list = new_points
         self.line_list = new_line_list
         self.circle_list = new_circle_list
         self.color_grid()
@@ -247,7 +247,7 @@ class PaintInterface:
         new_line_list = []
         new_circle_list = []
         self.clear_pixel_matrix()
-        for point in self.points:
+        for point in self.point_list:
             x, y = point
             x, y = self.functions.reflex(x, y, "xy")
             new_points.append((x, y))
@@ -265,7 +265,7 @@ class PaintInterface:
             x2, y2 = self.functions.reflex(x2, y2, "xy")
             new_circle = ((x1, y1),(x2, y2))
             new_circle_list.append(new_circle)
-        self.points = new_points
+        self.point_list = new_points
         self.line_list = new_line_list
         self.circle_list = new_circle_list
         self.color_grid()
@@ -280,10 +280,10 @@ class PaintInterface:
                 if 0 <= x < COLS and 0 <= y < ROWS:
                     self.pixels[y][x] = 1
             self.line_list.append((self.pointa, self.pointb))
-            if self.pointa in self.points:
-                self.points.remove(self.pointa)
-            if self.pointb in self.points:
-                self.points.remove(self.pointb)
+            if self.pointa in self.point_list:
+                self.point_list.remove(self.pointa)
+            if self.pointb in self.point_list:
+                self.point_list.remove(self.pointb)
             self.color_grid()
     
     def bresenham(self):
@@ -296,10 +296,10 @@ class PaintInterface:
                 if 0 <= x < COLS and 0 <= y < ROWS:
                     self.pixels[y][x] = 1
             self.line_list.append((self.pointa, self.pointb))
-            if self.pointa in self.points:
-                self.points.remove(self.pointa)
-            if self.pointb in self.points:
-                self.points.remove(self.pointb)
+            if self.pointa in self.point_list:
+                self.point_list.remove(self.pointa)
+            if self.pointb in self.point_list:
+                self.point_list.remove(self.pointb)
             self.color_grid()
 
     def circle(self):
@@ -313,8 +313,8 @@ class PaintInterface:
                 if 0 <= x < COLS and 0 <= y < ROWS:
                     self.pixels[y][x] = 1
             self.circle_list.append((self.pointa, self.pointb))
-            if self.pointb in self.points:
-                self.points.remove(self.pointb)
+            if self.pointb in self.point_list:
+                self.point_list.remove(self.pointb)
             self.color_grid()
 
     def cohen_sutherland(self):
@@ -338,10 +338,10 @@ class PaintInterface:
                 print(x1,y1,x2,y2)
                 if new_line:
                     new_line_list.append(new_line)
-            if self.pointa in self.points:
-                self.points.remove(self.pointa)
-            if self.pointb in self.points:
-                self.points.remove(self.pointb)
+            if self.pointa in self.point_list:
+                self.point_list.remove(self.pointa)
+            if self.pointb in self.point_list:
+                self.point_list.remove(self.pointb)
             self.color_grid(lines=new_line_list)
 
     def liang_barsky(self):
@@ -363,10 +363,10 @@ class PaintInterface:
                 new_line = self.functions.liang_barsky(x1, y1, x2, y2, x_min, y_min, x_max, y_max)
                 if new_line:
                     new_line_list.append(new_line)
-            if self.pointa in self.points:
-                self.points.remove(self.pointa)
-            if self.pointb in self.points:
-                self.points.remove(self.pointb)
+            if self.pointa in self.point_list:
+                self.point_list.remove(self.pointa)
+            if self.pointb in self.point_list:
+                self.point_list.remove(self.pointb)
             self.color_grid(lines=new_line_list)
 
 PaintInterface()
