@@ -6,15 +6,16 @@ class Functions:
         pass
 
     def move(self, x, y, dx, dy):
-        return x + dx, y + dy
+        return x + dx, y - dy
 
     def rotate(self, x, y, angle):
-        new_x = x * math.cos(angle) - y * math.sin(angle)
-        new_y = x * math.sin(angle) + y * math.cos(angle)
-        return new_x, new_y
+        radians_angle = math.radians(angle)
+        new_x = x * math.cos(radians_angle) - y * math.sin(radians_angle)
+        new_y = x * math.sin(radians_angle) + y * math.cos(radians_angle)
+        return int(new_x), int(new_y)
 
     def resize(self, x, y, scale_x, scale_y):
-        return x * scale_x, y * scale_y
+        return int(x * scale_x), int(y * scale_y)
 
     def reflex(self, x, y, axis):
         new_x, new_y = self.to_cartesian_plane(x, y)
@@ -207,3 +208,6 @@ class Functions:
     
     def distance(self, x1, y1, x2, y2):
         return int(math.sqrt((x2 - x1)**2 + (y2 - y1)**2))
+    
+    def midpoint(self, x1, y1, x2, y2):
+        return int((x1 + x2) // 2), int((y1 + y2) // 2)

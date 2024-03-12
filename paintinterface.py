@@ -4,16 +4,24 @@ class PaintInterface:
     def __init__(self):
         # Create a 2D array to store the state of each pixel (on/off)
         self.pixels = [[0 for _ in range(COLS)] for _ in range(ROWS)]
-        window = Tk()
-        self.canvas = Canvas(window, width=WIDTH, height=HEIGHT, bg="white")
+        # Saves the points, lines and circles positions
+        self.points = []
+        self.line_list = []
+        self.circle_list = []
+        self.window = Tk()
+        self.canvas = Canvas(self.window, width=WIDTH, height=HEIGHT, bg="white")
         self.canvas.pack()
+        self.functions = Functions()
+        # Create a variable to store the position of the last 2 clicks
+        self.pointa = None
+        self.pointb = None
 
         # Create a menu bar
-        self.menubar = Menu(window)
+        self.menubar = Menu(self.window)
 
         # Create a transformations menu and add it to the menu bar
         transformations_menu = Menu(self.menubar, tearoff=0)
-        transformations_menu.add_command(label="Translation", command=self.translation)
+        transformations_menu.add_command(label="Line Translation", command=self.line_translation)
         transformations_menu.add_command(label="Rotation", command=self.rotation)
         transformations_menu.add_command(label="Scale", command=self.scale)
         transformations_menu.add_command(label="Reflection X", command=self.reflection_x)
@@ -23,19 +31,19 @@ class PaintInterface:
 
         # Create a rasterization menu and add it to the menu bar
         rasterization_menu = Menu(self.menubar, tearoff=0)
-        rasterization_menu.add_command(label="DDA Line", command=self.translation)
-        rasterization_menu.add_command(label="Bresenham Line", command=self.rotation)
-        rasterization_menu.add_command(label="Bresenham Circle", command=self.scale)
+        rasterization_menu.add_command(label="DDA Line", command=self.dda)
+        rasterization_menu.add_command(label="Bresenham Line", command=self.bresenham)
+        rasterization_menu.add_command(label="Bresenham Circle", command=self.circle)
         self.menubar.add_cascade(label="Rasterization", menu=rasterization_menu)
 
         # Create a cutout menu and add it to the menu bar
         cutout_menu = Menu(self.menubar, tearoff=0)
-        cutout_menu.add_command(label="Cohen-Sutherland", command=self.translation)
-        cutout_menu.add_command(label="Liang-Barsky", command=self.rotation)
+        cutout_menu.add_command(label="Cohen-Sutherland", command=self.cohen_sutherland)
+        cutout_menu.add_command(label="Liang-Barsky", command=self.liang_barsky)
         self.menubar.add_cascade(label="Cutout", menu=cutout_menu)
 
         # Display the menu
-        window.config(menu=self.menubar)
+        self.window.config(menu=self.menubar)
 
         # Bind the click event to the canvas
         self.canvas.bind("<Button-1>", self.click)
@@ -44,6 +52,41 @@ class PaintInterface:
         self.draw_grid()
 
         mainloop()
+
+    def clear_pixel_matrix(self):
+        self.pixels = [[0 for _ in range(COLS)] for _ in range(ROWS)]
+        self.draw_grid()
+
+    def color_grid(self, points=None, lines=None, circles=None):
+        if not points:
+            points = self.points
+        if not lines:
+            lines = self.line_list
+        if not circles:
+            circles = self.circle_list
+        self.clear_pixel_matrix()
+        for point in points:
+            x, y = point
+            if 0 <= x < COLS and 0 <= y < ROWS:
+                self.pixels[y][x] = 1
+        for line in lines:
+            x1, y1 = line[0]
+            x2, y2 = line[1]
+            points = self.functions.dda(x1, y1, x2, y2)
+            for point in points:
+                x, y = point
+                if 0 <= x < COLS and 0 <= y < ROWS:
+                    self.pixels[y][x] = 1
+        for circle in circles:
+            x1, y1 = circle[0]
+            x2, y2 = circle[1]
+            distance = self.functions.distance(x1, y1, x2, y2)
+            points = self.functions.circle(x1, y1, distance)
+            for point in points:
+                x, y = point
+                if 0 <= x < COLS and 0 <= y < ROWS:
+                    self.pixels[y][x] = 1
+        self.draw_grid()
 
     def draw_grid(self):
         for i in range(ROWS):
@@ -66,29 +109,264 @@ class PaintInterface:
         if 0 <= x < COLS and 0 <= y < ROWS:
             if self.pixels[y][x] == 1:
                 self.pixels[y][x] = 0
-                print(f"Pixel ({x}, {y}) is off")
+                if (x, y) in self.points:
+                    self.points.remove((x, y))
             else:
                 self.pixels[y][x] = 1
-                print(f"Pixel ({x}, {y}) is on")
+                self.points.append((x, y))
+                self.pointb = self.pointa
+                self.pointa = (x, y)
         # Redraw the grid
         self.draw_grid()
 
-    def translation(self):
-        print("Translation")
+    def line_translation(self):
+        p = PopupWindow(self.window, "Line Translation", "Enter the translation factor in X,Y, and select which line to move", self.line_list)
+        self.window.wait_window(p.popup)
+        user_input, line_chosen = p.get_user_input()
+        dx, dy = map(int, user_input.replace(" ", "").split(","))
+        self.clear_pixel_matrix()
+        new_line = []
+        for point in line_chosen:
+            x, y = point
+            x, y = self.functions.move(x, y, dx, dy)
+            new_line.append((x, y))
+        self.line_list.remove(line_chosen)
+        self.line_list.append((new_line[0], new_line[1]))
+        self.color_grid()
 
     def rotation(self):
-        print("Rotation")
+        p = PopupWindow(self.window, "Line Rotation", "Enter the rotation angle in degrees, and select which line to rotate", self.line_list)
+        self.window.wait_window(p.popup)
+        user_input, line_chosen = p.get_user_input()
+        if user_input and line_chosen:
+            self.clear_pixel_matrix()
+            angle = int(user_input)
+            xm, ym = self.functions.midpoint(line_chosen[0][0], line_chosen[0][1], line_chosen[1][0], line_chosen[1][1])        
+            point1, point2 = line_chosen
+            # Makes the midpoint the (0,0)
+            x1 = point1[0] - xm
+            y1 = point1[1] - ym
+            x2 = point2[0] - xm
+            y2 = point2[1] - ym
+            x1, y1 = self.functions.rotate(x1, y1, angle)
+            x2, y2 = self.functions.rotate(x2, y2, angle)
+            # Returns to the original way
+            x1 = x1 + xm
+            y1 = y1 + ym
+            x2 = x2 + xm
+            y2 = y2 + ym
+            new_line = ((x1, y1),(x2, y2))
+            self.line_list.remove(line_chosen)
+            self.line_list.append(new_line)
+        self.color_grid()
 
     def scale(self):
-        print("Scale")
+        p = PopupWindow(self.window, "Line Scale", "Enter the scale factor in X,Y, and select which line to scale", self.line_list)
+        self.window.wait_window(p.popup)
+        user_input, line_chosen = p.get_user_input()
+        if user_input and line_chosen:
+            scale_x, scale_y = map(float, user_input.replace(" ", "").split(","))
+            self.clear_pixel_matrix()
+            xm, ym = self.functions.midpoint(line_chosen[0][0], line_chosen[0][1], line_chosen[1][0], line_chosen[1][1])
+            point1, point2 = line_chosen
+            # Makes the midpoint the (0,0)
+            x1 = point1[0] - xm
+            y1 = point1[1] - ym
+            x2 = point2[0] - xm
+            y2 = point2[1] - ym
+            x1, y1 = self.functions.resize(x1, y1, scale_x, scale_y)
+            x2, y2 = self.functions.resize(x2, y2, scale_x, scale_y)
+            # Returns to the original way
+            x1 = x1 + xm
+            y1 = y1 + ym
+            x2 = x2 + xm
+            y2 = y2 + ym
+            new_line = ((x1, y1),(x2, y2))
+            self.line_list.remove(line_chosen)
+            self.line_list.append(new_line)
+        self.color_grid()
 
     def reflection_x(self):
-        print("Reflection X")
-    
+        new_points = []
+        new_line_list = []
+        new_circle_list = []
+        self.clear_pixel_matrix()
+        for point in self.points:
+            x, y = point
+            x, y = self.functions.reflex(x, y, "x")
+            new_points.append((x, y))
+        for line in self.line_list:
+            x1, y1 = line[0]
+            x2, y2 = line[1]
+            x1, y1 = self.functions.reflex(x1, y1, "x")
+            x2, y2 = self.functions.reflex(x2, y2, "x")
+            new_line = ((x1, y1),(x2, y2))
+            new_line_list.append(new_line)
+        for circle in self.circle_list:
+            x1, y1 = circle[0]
+            x2, y2 = circle[1]
+            x1, y1 = self.functions.reflex(x1, y1, "x")
+            x2, y2 = self.functions.reflex(x2, y2, "x")
+            new_circle = ((x1, y1),(x2, y2))
+            new_circle_list.append(new_circle)
+        self.points = new_points
+        self.line_list = new_line_list
+        self.circle_list = new_circle_list
+        self.color_grid()
+
     def reflection_y(self):
-        print("Reflection Y")
-    
+        new_points = []
+        new_line_list = []
+        new_circle_list = []
+        self.clear_pixel_matrix()
+        for point in self.points:
+            x, y = point
+            x, y = self.functions.reflex(x, y, "y")
+            new_points.append((x, y))
+        for line in self.line_list:
+            x1, y1 = line[0]
+            x2, y2 = line[1]
+            x1, y1 = self.functions.reflex(x1, y1, "y")
+            x2, y2 = self.functions.reflex(x2, y2, "y")
+            new_line = ((x1, y1),(x2, y2))
+            new_line_list.append(new_line)
+        for circle in self.circle_list:
+            x1, y1 = circle[0]
+            x2, y2 = circle[1]
+            x1, y1 = self.functions.reflex(x1, y1, "y")
+            x2, y2 = self.functions.reflex(x2, y2, "y")
+            new_circle = ((x1, y1),(x2, y2))
+            new_circle_list.append(new_circle)
+        self.points = new_points
+        self.line_list = new_line_list
+        self.circle_list = new_circle_list
+        self.color_grid()
+
     def reflection_xy(self):
-        print("Reflection XY")
+        new_points = []
+        new_line_list = []
+        new_circle_list = []
+        self.clear_pixel_matrix()
+        for point in self.points:
+            x, y = point
+            x, y = self.functions.reflex(x, y, "xy")
+            new_points.append((x, y))
+        for line in self.line_list:
+            x1, y1 = line[0]
+            x2, y2 = line[1]
+            x1, y1 = self.functions.reflex(x1, y1, "xy")
+            x2, y2 = self.functions.reflex(x2, y2, "xy")
+            new_line = ((x1, y1),(x2, y2))
+            new_line_list.append(new_line)
+        for circle in self.circle_list:
+            x1, y1 = circle[0]
+            x2, y2 = circle[1]
+            x1, y1 = self.functions.reflex(x1, y1, "xy")
+            x2, y2 = self.functions.reflex(x2, y2, "xy")
+            new_circle = ((x1, y1),(x2, y2))
+            new_circle_list.append(new_circle)
+        self.points = new_points
+        self.line_list = new_line_list
+        self.circle_list = new_circle_list
+        self.color_grid()
+
+    def dda(self):
+        if self.pointb:
+            x1, y1 = self.pointa
+            x2, y2 = self.pointb
+            points = self.functions.dda(x1, y1, x2, y2)
+            for point in points:
+                x, y = point
+                if 0 <= x < COLS and 0 <= y < ROWS:
+                    self.pixels[y][x] = 1
+            self.line_list.append((self.pointa, self.pointb))
+            if self.pointa in self.points:
+                self.points.remove(self.pointa)
+            if self.pointb in self.points:
+                self.points.remove(self.pointb)
+            self.color_grid()
+    
+    def bresenham(self):
+        if self.pointb:
+            x1, y1 = self.pointa
+            x2, y2 = self.pointb
+            points = self.functions.bres(x1, y1, x2, y2)
+            for point in points:
+                x, y = point
+                if 0 <= x < COLS and 0 <= y < ROWS:
+                    self.pixels[y][x] = 1
+            self.line_list.append((self.pointa, self.pointb))
+            if self.pointa in self.points:
+                self.points.remove(self.pointa)
+            if self.pointb in self.points:
+                self.points.remove(self.pointb)
+            self.color_grid()
+
+    def circle(self):
+        if self.pointb:
+            x1, y1 = self.pointa
+            x2, y2 = self.pointb
+            distance = self.functions.distance(x1, y1, x2, y2)
+            points = self.functions.circle(x1, y1, distance)
+            for point in points:
+                x, y = point
+                if 0 <= x < COLS and 0 <= y < ROWS:
+                    self.pixels[y][x] = 1
+            self.circle_list.append((self.pointa, self.pointb))
+            if self.pointb in self.points:
+                self.points.remove(self.pointb)
+            self.color_grid()
+
+    def cohen_sutherland(self):
+        if self.pointb:
+            new_line_list = []
+            xa, ya = self.pointa
+            xb, yb = self.pointb
+            if xa < xb:
+                x_min, x_max = xa, xb
+            else:
+                x_min, x_max = xb, xa
+            if ya < yb:
+                y_min, y_max = ya, yb
+            else:
+                y_min, y_max = yb, ya
+            for line in self.line_list:
+                x1, y1 = line[0]
+                x2, y2 = line[1]
+                print(x1,y1,x2,y2)
+                new_line = self.functions.cohen_sutherland(x1, y1, x2, y2, x_min, y_min, x_max, y_max)
+                print(x1,y1,x2,y2)
+                if new_line:
+                    new_line_list.append(new_line)
+            if self.pointa in self.points:
+                self.points.remove(self.pointa)
+            if self.pointb in self.points:
+                self.points.remove(self.pointb)
+            self.color_grid(lines=new_line_list)
+
+    def liang_barsky(self):
+        if self.pointb:
+            new_line_list = []
+            xa, ya = self.pointa
+            xb, yb = self.pointb
+            if xa < xb:
+                x_min, x_max = xa, xb
+            else:
+                x_min, x_max = xb, xa
+            if ya < yb:
+                y_min, y_max = ya, yb
+            else:
+                y_min, y_max = yb, ya
+            for line in self.line_list:
+                x1, y1 = line[0]
+                x2, y2 = line[1]
+                new_line = self.functions.liang_barsky(x1, y1, x2, y2, x_min, y_min, x_max, y_max)
+                if new_line:
+                    new_line_list.append(new_line)
+            if self.pointa in self.points:
+                self.points.remove(self.pointa)
+            if self.pointb in self.points:
+                self.points.remove(self.pointb)
+            self.color_grid(lines=new_line_list)
 
 PaintInterface()

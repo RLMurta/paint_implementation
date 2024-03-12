@@ -9,10 +9,10 @@ class PopupWindow:
         self.popup = Toplevel(self.master)
         self.popup.title(self.title)
         if itens:
-            self.popup.geometry("400x150")
+            self.popup.geometry("500x150")
             self.has_listbox = True
         else:
-            self.popup.geometry("400x100")
+            self.popup.geometry("500x100")
             self.has_listbox = False
         self.popup.resizable(False, False)
         self.popup.grab_set()

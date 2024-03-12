@@ -9,7 +9,7 @@ GREEN = (0, 0, 255)
 FPS = 120
 
 # Space between grid and toolbar
-OFFSET = 25
+OFFSET = 0
 
 # Window Settings
 WIDTH, HEIGHT = 700, 700
