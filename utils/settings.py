@@ -1,11 +1,11 @@
 # Space between grid and toolbar
-OFFSET = 0
+OFFSET = 20
 
 # Window Settings
 WIDTH, HEIGHT = 700, 700
 
 # Grid Settings
-ROWS = COLS = 50
+ROWS = COLS = 40
 
 # Toolbar Settings
 TOOLBAR_HEIGHT = HEIGHT - WIDTH
