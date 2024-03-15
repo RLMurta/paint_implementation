@@ -59,6 +59,23 @@ class PaintInterface:
         self.pixels = [[0 for _ in range(COLS)] for _ in range(ROWS)]
         self.draw_grid()
 
+    # Draw the grid with all the points which are set on as black
+    def draw_grid(self):
+        for i in range(ROWS):
+            for j in range(COLS):
+                color = 'black' if self.pixels[i][j] else 'white'
+                x0, y0 = OFFSET + j*PIXEL_SIZE, OFFSET + i*PIXEL_SIZE
+                x1, y1 = OFFSET + (j+1)*PIXEL_SIZE, OFFSET + (i+1)*PIXEL_SIZE
+                self.canvas.create_rectangle(x0, y0, x1, y1, fill=color)
+
+        # Draw horizontal lines
+        for i in range(ROWS + 1):
+            self.canvas.create_line(OFFSET, OFFSET + i*PIXEL_SIZE, OFFSET + COLS*PIXEL_SIZE, OFFSET + i*PIXEL_SIZE, fill='black')
+
+        # Draw vertical lines
+        for i in range(COLS + 1):
+            self.canvas.create_line(OFFSET + i*PIXEL_SIZE, OFFSET, OFFSET + i*PIXEL_SIZE, OFFSET + ROWS*PIXEL_SIZE, fill='black')
+
     # Sets the grid with the current state of the points, lines and circles
     def color_grid(self, points=None, lines=None, circles=None):
         if not points:
@@ -91,31 +108,17 @@ class PaintInterface:
                     self.pixels[y][x] = 1
         self.draw_grid()
 
-    # Draw the grid with the current state of the points, lines and circles
-    def draw_grid(self):
-        for i in range(ROWS):
-            for j in range(COLS):
-                color = 'black' if self.pixels[i][j] else 'white'
-                self.canvas.create_rectangle(OFFSET + j*PIXEL_SIZE, OFFSET + i*PIXEL_SIZE, OFFSET + (j+1)*PIXEL_SIZE, OFFSET + (i+1)*PIXEL_SIZE, fill=color)
-
-        # Draw horizontal lines
-        for i in range(ROWS + 1):
-            self.canvas.create_line(OFFSET, OFFSET + i*PIXEL_SIZE, OFFSET + COLS*PIXEL_SIZE, OFFSET + i*PIXEL_SIZE, fill='black')
-
-        # Draw vertical lines
-        for i in range(COLS + 1):
-            self.canvas.create_line(OFFSET + i*PIXEL_SIZE, OFFSET, OFFSET + i*PIXEL_SIZE, OFFSET + ROWS*PIXEL_SIZE, fill='black')
-
     # Change the state of the pixel where the click occurred
     def click(self, event):
         # Calculate the position of the pixel where the click occurred
         x, y = (event.x - OFFSET) // PIXEL_SIZE, (event.y - OFFSET) // PIXEL_SIZE
-        # Change the state of the pixel to on
         if 0 <= x < COLS and 0 <= y < ROWS:
+            # Change the state of the pixel to off if it is on
             if self.pixels[y][x] == 1:
                 self.pixels[y][x] = 0
                 if (x, y) in self.point_list:
                     self.point_list.remove((x, y))
+            # Change the state of the pixel to on if it is off
             else:
                 self.pixels[y][x] = 1
                 self.point_list.append((x, y))
@@ -123,6 +126,8 @@ class PaintInterface:
                 self.pointa = (x, y)
         # Redraw the grid
         self.draw_grid()
+
+    # Here starts the functions that are called when a button in a menu is pressed
 
     def line_translation(self):
         p = PopupWindow(self.window, "Line Translation", "Enter the translation factor in X,Y, and select which line to move", self.line_list)
