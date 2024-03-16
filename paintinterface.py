@@ -10,6 +10,7 @@ class PaintInterface:
         self.line_list = []
         self.circle_list = []
         self.window = Tk()
+        self.window.title("Paint")
         self.canvas = Canvas(self.window, width=WIDTH, height=HEIGHT, bg="white")
         self.canvas.pack()
         self.functions = Functions()
@@ -133,15 +134,16 @@ class PaintInterface:
         p = PopupWindow(self.window, "Line Translation", "Enter the translation factor in X,Y, and select which line to move", self.line_list)
         self.window.wait_window(p.popup)
         user_input, line_chosen = p.get_user_input()
-        dx, dy = map(int, user_input.replace(" ", "").split(","))
-        self.clear_pixel_matrix()
-        new_line = []
-        for point in line_chosen:
-            x, y = point
-            x, y = self.functions.move(x, y, dx, dy)
-            new_line.append((x, y))
-        self.line_list.remove(line_chosen)
-        self.line_list.append((new_line[0], new_line[1]))
+        if user_input and line_chosen:
+            dx, dy = map(int, user_input.replace(" ", "").split(","))
+            self.clear_pixel_matrix()
+            new_line = []
+            for point in line_chosen:
+                x, y = point
+                x, y = self.functions.move(x, y, dx, dy)
+                new_line.append((x, y))
+            self.line_list.remove(line_chosen)
+            self.line_list.append((new_line[0], new_line[1]))
         self.color_grid()
 
     def rotation(self):
@@ -285,11 +287,11 @@ class PaintInterface:
             x1, y1 = self.pointa
             x2, y2 = self.pointb
             points = self.functions.dda(x1, y1, x2, y2)
+            self.line_list.append((self.pointa, self.pointb))
             for point in points:
                 x, y = point
                 if 0 <= x < COLS and 0 <= y < ROWS:
                     self.pixels[y][x] = 1
-            self.line_list.append((self.pointa, self.pointb))
             if self.pointa in self.point_list:
                 self.point_list.remove(self.pointa)
             if self.pointb in self.point_list:
@@ -301,11 +303,11 @@ class PaintInterface:
             x1, y1 = self.pointa
             x2, y2 = self.pointb
             points = self.functions.bres(x1, y1, x2, y2)
+            self.line_list.append((self.pointa, self.pointb))
             for point in points:
                 x, y = point
                 if 0 <= x < COLS and 0 <= y < ROWS:
                     self.pixels[y][x] = 1
-            self.line_list.append((self.pointa, self.pointb))
             if self.pointa in self.point_list:
                 self.point_list.remove(self.pointa)
             if self.pointb in self.point_list:
@@ -318,11 +320,11 @@ class PaintInterface:
             x2, y2 = self.pointb
             distance = self.functions.distance(x1, y1, x2, y2)
             points = self.functions.circle(x1, y1, distance)
+            self.circle_list.append((self.pointa, self.pointb))
             for point in points:
                 x, y = point
                 if 0 <= x < COLS and 0 <= y < ROWS:
                     self.pixels[y][x] = 1
-            self.circle_list.append((self.pointa, self.pointb))
             if self.pointa in self.point_list:
                 self.point_list.remove(self.pointa)
             if self.pointb in self.point_list:
@@ -345,9 +347,7 @@ class PaintInterface:
             for line in self.line_list:
                 x1, y1 = line[0]
                 x2, y2 = line[1]
-                print(x1,y1,x2,y2)
                 new_line = self.functions.cohen_sutherland(x1, y1, x2, y2, x_min, y_min, x_max, y_max)
-                print(x1,y1,x2,y2)
                 if new_line:
                     new_line_list.append(new_line)
             if self.pointa in self.point_list:
