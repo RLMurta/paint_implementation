@@ -18,13 +18,12 @@ class Functions:
         return int(x * scale_x), int(y * scale_y)
 
     def reflex(self, x, y, axis):
-        new_x, new_y = self.to_cartesian_plane(x, y)
         if axis == "x":
-                return self.to_screen_plane(-new_x - 1, new_y)
+                return self.to_screen_plane(-x - 1, y)
         elif axis == "y":
-            return self.to_screen_plane(new_x, -new_y - 1)
+            return self.to_screen_plane(x, -y - 1)
         elif axis == "xy":
-            return self.to_screen_plane(-new_x - 1, -new_y - 1)
+            return self.to_screen_plane(-x - 1, -y - 1)
         else:
             return x, y
 

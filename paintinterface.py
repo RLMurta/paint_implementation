@@ -205,11 +205,14 @@ class PaintInterface:
         self.clear_pixel_matrix()
         for point in self.point_list:
             x, y = point
+            x, y = self.functions.to_cartesian_plane(x, y)
             x, y = self.functions.reflex(x, y, "x")
             new_points.append((x, y))
         for line in self.line_list:
             x1, y1 = line[0]
             x2, y2 = line[1]
+            x1, y1 = self.functions.to_cartesian_plane(x1, y1)
+            x2, y2 = self.functions.to_cartesian_plane(x2, y2)
             x1, y1 = self.functions.reflex(x1, y1, "x")
             x2, y2 = self.functions.reflex(x2, y2, "x")
             new_line = ((x1, y1),(x2, y2))
@@ -217,6 +220,8 @@ class PaintInterface:
         for circle in self.circle_list:
             x1, y1 = circle[0]
             x2, y2 = circle[1]
+            x1, y1 = self.functions.to_cartesian_plane(x1, y1)
+            x2, y2 = self.functions.to_cartesian_plane(x2, y2)
             x1, y1 = self.functions.reflex(x1, y1, "x")
             x2, y2 = self.functions.reflex(x2, y2, "x")
             new_circle = ((x1, y1),(x2, y2))
@@ -233,11 +238,14 @@ class PaintInterface:
         self.clear_pixel_matrix()
         for point in self.point_list:
             x, y = point
+            x, y = self.functions.to_cartesian_plane(x, y)
             x, y = self.functions.reflex(x, y, "y")
             new_points.append((x, y))
         for line in self.line_list:
             x1, y1 = line[0]
             x2, y2 = line[1]
+            x1, y1 = self.functions.to_cartesian_plane(x1, y1)
+            x2, y2 = self.functions.to_cartesian_plane(x2, y2)
             x1, y1 = self.functions.reflex(x1, y1, "y")
             x2, y2 = self.functions.reflex(x2, y2, "y")
             new_line = ((x1, y1),(x2, y2))
@@ -245,6 +253,8 @@ class PaintInterface:
         for circle in self.circle_list:
             x1, y1 = circle[0]
             x2, y2 = circle[1]
+            x1, y1 = self.functions.to_cartesian_plane(x1, y1)
+            x2, y2 = self.functions.to_cartesian_plane(x2, y2)
             x1, y1 = self.functions.reflex(x1, y1, "y")
             x2, y2 = self.functions.reflex(x2, y2, "y")
             new_circle = ((x1, y1),(x2, y2))
@@ -261,11 +271,14 @@ class PaintInterface:
         self.clear_pixel_matrix()
         for point in self.point_list:
             x, y = point
+            x, y = self.functions.to_cartesian_plane(x, y)
             x, y = self.functions.reflex(x, y, "xy")
             new_points.append((x, y))
         for line in self.line_list:
             x1, y1 = line[0]
             x2, y2 = line[1]
+            x1, y1 = self.functions.to_cartesian_plane(x1, y1)
+            x2, y2 = self.functions.to_cartesian_plane(x2, y2)
             x1, y1 = self.functions.reflex(x1, y1, "xy")
             x2, y2 = self.functions.reflex(x2, y2, "xy")
             new_line = ((x1, y1),(x2, y2))
@@ -273,6 +286,8 @@ class PaintInterface:
         for circle in self.circle_list:
             x1, y1 = circle[0]
             x2, y2 = circle[1]
+            x1, y1 = self.functions.to_cartesian_plane(x1, y1)
+            x2, y2 = self.functions.to_cartesian_plane(x2, y2)
             x1, y1 = self.functions.reflex(x1, y1, "xy")
             x2, y2 = self.functions.reflex(x2, y2, "xy")
             new_circle = ((x1, y1),(x2, y2))
