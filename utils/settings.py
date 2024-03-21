@@ -12,3 +12,7 @@ TOOLBAR_HEIGHT = HEIGHT - WIDTH
 
 # Drawing Settings
 PIXEL_SIZE = (WIDTH - 2 * OFFSET) // COLS
+
+# Algorithms
+DDA = 0
+BRESENHAM = 1

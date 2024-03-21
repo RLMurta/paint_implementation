@@ -6,6 +6,7 @@ class PaintInterface:
         # Create a 2D array to store the state of each pixel (on/off)
         self.pixels = [[0 for _ in range(COLS)] for _ in range(ROWS)]
         # Saves the points, lines and circles positions
+        self.line_algorithm = DDA
         self.point_list = []
         self.line_list = []
         self.circle_list = []
@@ -93,7 +94,10 @@ class PaintInterface:
         for line in lines:
             x1, y1 = line[0]
             x2, y2 = line[1]
-            points = self.functions.dda(x1, y1, x2, y2)
+            if self.line_algorithm == DDA:
+                points = self.functions.dda(x1, y1, x2, y2)
+            elif self.line_algorithm == BRESENHAM:
+                points = self.functions.bres(x1, y1, x2, y2)
             for point in points:
                 x, y = point
                 if 0 <= x < COLS and 0 <= y < ROWS:
@@ -311,6 +315,7 @@ class PaintInterface:
                 self.point_list.remove(self.pointa)
             if self.pointb in self.point_list:
                 self.point_list.remove(self.pointb)
+            self.line_algorithm = DDA
             self.color_grid()
     
     def bresenham(self):
@@ -327,6 +332,7 @@ class PaintInterface:
                 self.point_list.remove(self.pointa)
             if self.pointb in self.point_list:
                 self.point_list.remove(self.pointb)
+            self.line_algorithm = BRESENHAM
             self.color_grid()
 
     def circle(self):
